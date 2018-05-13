@@ -19,6 +19,8 @@ import android.text.format.DateUtils;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.alamkanak.weekview.DateTimeInterpreter;
@@ -70,7 +72,7 @@ public class CalendarActivity extends ActivityForAccessingTumOnline<CalendarRowS
     private static final String[] PERMISSIONS_CALENDAR = {Manifest.permission.READ_CALENDAR,
                                                           Manifest.permission.WRITE_CALENDAR};
     private static final int TIME_TO_SYNC_CALENDAR = 604800; // 1 week
-    private CalendarController calendarController;
+    private CalendarController calendarController = new CalendarController(this);
     private final LifecycleProvider<Lifecycle.Event> provider = AndroidLifecycle.createLifecycleProvider(this);
 
     /**
@@ -91,7 +93,14 @@ public class CalendarActivity extends ActivityForAccessingTumOnline<CalendarRowS
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        Button button = (Button) findViewById(R.id.calendar_refresh);
+        button.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                requestFetch();
+                refreshWeekView();
+            }
+        });
         // Get a reference for the week view in the layout.
         mWeekView = findViewById(R.id.weekView);
 
@@ -173,7 +182,7 @@ public class CalendarActivity extends ActivityForAccessingTumOnline<CalendarRowS
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item) {//集成了所有toolbar所有小软件
         int i = item.getItemId();
         if (i == R.id.action_switch_view_mode) {
             mWeekMode = !mWeekMode;
@@ -230,6 +239,7 @@ public class CalendarActivity extends ActivityForAccessingTumOnline<CalendarRowS
             menuItemSwitchView.setIcon(icon);
         }
     }
+
 
     /**
      * Asynchronous task for exporting the calendar to a local Google calendar
@@ -309,6 +319,7 @@ public class CalendarActivity extends ActivityForAccessingTumOnline<CalendarRowS
         if (which == DialogInterface.BUTTON_POSITIVE) {
             displayCalendarOnGoogleCalendar();
         }
+
     }
 
     /**
